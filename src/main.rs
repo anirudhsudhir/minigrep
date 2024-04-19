@@ -8,8 +8,6 @@ fn main() {
         process::exit(1);
     });
 
-    println! {"query = {}, filepath = {}",config.query, config.filepath};
-
     if let Err(err) = minigrep::run(&config) {
         println!("Application error: {}", err);
         process::exit(1);

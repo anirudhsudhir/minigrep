@@ -6,13 +6,6 @@ pub struct Config {
     pub filepath: String,
 }
 
-pub fn run(config: &Config) -> Result<(), Box<dyn Error>> {
-    let filecontent = fs::read_to_string(config.filepath.clone())?;
-    println!("{}", filecontent);
-
-    Ok(())
-}
-
 impl Config {
     pub fn build(args: &[String]) -> Result<Config, &'static str> {
         if args.len() < 3 {
@@ -23,5 +16,42 @@ impl Config {
                 filepath: args[2].clone(),
             })
         }
+    }
+}
+
+pub fn run(config: &Config) -> Result<(), Box<dyn Error>> {
+    let filecontent = fs::read_to_string(config.filepath.clone())?;
+
+    for line in search(&config.query, &filecontent) {
+        println!("{line}");
+    }
+
+    Ok(())
+}
+
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let mut results = vec![];
+
+    for line in contents.lines() {
+        if line.contains(query) {
+            results.push(line);
+        }
+    }
+
+    results
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_search() {
+        let query = "help";
+        let content = "\
+I can’t help thinking:
+Why is “abbreviation”
+A very long word?";
+        assert_eq!(vec!["I can’t help thinking:"], search(query, content));
     }
 }
